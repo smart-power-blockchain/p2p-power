@@ -26,9 +26,7 @@ class Transaction:
                             'value': self.value})
 
     def sign_transaction(self):
-        """
-        Sign transaction with private key
-        """
+        # sign transaction with an private key
         private_key = RSA.importKey(binascii.unhexlify(self.sender_private_key))
         signer = PKCS1_v1_5.new(private_key)
         h = SHA.new(str(self.to_dict()).encode('utf8'))
