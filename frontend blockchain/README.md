@@ -1,8 +1,3 @@
-# Blockchain Python tutorial
-* Source Code for my blog post: [A Practical Introduction to Blockchain with Python](http://adilmoujahid.com/posts/2018/03/intro-blockchain-bitcoin-python/)
-
-## Important: This project is for educational purposes only and the source code shouldn't be use in production as it doesn't have good security, doesn't scale well and lacks many important features.
-
 
 <div style="display:block;margin:auto;height:80%;width:80%">
   <img src="blockchain-simulation.gif">
@@ -39,7 +34,3 @@ This github repository also contains 2 dashboards:
 3. TO start the blockchain client, go to ```blockchain_client``` folder and execute the command below:
 ```python blockchain_client.py -p 8080```
 4. You can access the blockchain frontend and blockchain client dashboards from your browser by going to localhost:5000 and localhost:8080
-
-
-
-# Visit my Blog : http://adilmoujahid.com
