@@ -1,42 +1,18 @@
-'''
-title           : blockchain.py
-description     : A blockchain implemenation
-author          : Adil Moujahid
-date_created    : 20180212
-date_modified   : 20180309
-version         : 0.5
-usage           : python blockchain.py
-                  python blockchain.py -p 5000
-                  python blockchain.py --port 5000
-python_version  : 3.6.1
-Comments        : The blockchain implementation is mostly based on [1]. 
-                  I made a few modifications to the original code in order to add RSA encryption to the transactions 
-                  based on [2], changed the proof of work algorithm, and added some Flask routes to interact with the 
-                  blockchain from the dashboards
-References      : [1] https://github.com/dvf/blockchain/blob/master/blockchain.py
-                  [2] https://github.com/julienr/ipynb_playground/blob/master/bitcoin/dumbcoin/dumbcoin.ipynb
-'''
-
 from collections import OrderedDict
-
 import binascii
-
 import Crypto
 import Crypto.Random
 from Crypto.Hash import SHA
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
-
 import hashlib
 import json
 from time import time
 from urllib.parse import urlparse
 from uuid import uuid4
-
 import requests
 from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
-
 
 
 MINING_SENDER = "THE BLOCKCHAIN"
@@ -164,15 +140,12 @@ class Blockchain:
 
         while current_index < len(chain):
             block = chain[current_index]
-            #print(last_block)
-            #print(block)
-            #print("\n-----------\n")
             # Check that the hash of the block is correct
             if block['previous_hash'] != self.hash(last_block):
                 return False
 
             # Check that the Proof of Work is correct
-            #Delete the reward transaction
+            # Delete the reward transaction
             transactions = block['transactions'][:-1]
             # Need to make sure that the dictionary is ordered. Otherwise we'll get a different hash
             transaction_elements = ['sender_address', 'recipient_address', 'value']
@@ -255,7 +228,7 @@ def new_transaction():
 
 @app.route('/transactions/get', methods=['GET'])
 def get_transactions():
-    #Get transactions from transactions pool
+    # Get transactions from transactions pool
     transactions = blockchain.transactions
 
     response = {'transactions': transactions}
