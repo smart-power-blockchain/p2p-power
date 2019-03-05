@@ -39,7 +39,3 @@ This github repository also contains 2 dashboards:
 3. TO start the blockchain client, go to ```blockchain_client``` folder and execute the command below:
 ```python blockchain_client.py -p 8080```
 4. You can access the blockchain frontend and blockchain client dashboards from your browser by going to localhost:5000 and localhost:8080
-
-
-
-# Visit my Blog : http://adilmoujahid.com
