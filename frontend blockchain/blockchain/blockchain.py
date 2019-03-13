@@ -14,7 +14,6 @@ import requests
 from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 
-
 MINING_SENDER = "THE BLOCKCHAIN"
 MINING_REWARD = 1
 MINING_DIFFICULTY = 2
@@ -41,7 +40,7 @@ class Blockchain:
         if parsed_url.netloc:
             self.nodes.add(parsed_url.netloc)
         elif parsed_url.path:
-            # Accepts an URL without scheme like '192.168.0.5:5000'.
+            # Accepts an URL without scheme like '192.168.0.5:5000 on a network'.
             self.nodes.add(parsed_url.path)
         else:
             raise ValueError('Invalid URL')
@@ -124,9 +123,11 @@ class Blockchain:
         guess_hash = hashlib.sha256(guess).hexdigest()
         return guess_hash[:difficulty] == '0'*difficulty
 
+
+    #TODO: IMPLEMENT THE CHECKING OF INITIAL VALUE TO BEGIN WITH
     def valid_chain(self, chain):
         """
-        check if a bockchain is valid
+        check if a blockchain is valid
         """
         last_block = chain[0]
         current_index = 1

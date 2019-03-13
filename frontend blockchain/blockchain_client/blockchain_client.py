@@ -9,6 +9,9 @@ import requests
 from flask import Flask, jsonify, request, render_template
 
 
+DEFAULT_WALLET = 50
+
+
 class Transaction:
 
     def __init__(self, sender_address, sender_private_key, recipient_address, value):
@@ -51,16 +54,16 @@ def make_transaction():
 def view_transaction():
     return render_template('./view_transactions.html')
 
-
+#TODO: ENCRYPT WALLET AND PRIVATE KEY BEFORE STORE IN saveWallet
 @app.route('/wallet/new', methods=['GET'])
 def new_wallet():
     random_gen = Crypto.Random.new().read
     private_key = RSA.generate(1024, random_gen)
     public_key = private_key.publickey()
 
-    with open('saveKey.txt', 'w') as f:
-        f.write("{},{}".format(binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
-        binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii')))
+    with open('saveWallet.txt', 'w') as f:
+        f.write("{},{},{}".format(binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
+        binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii'),DEFAULT_WALLET))
 
     response = {
         'private_key': binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
