@@ -54,7 +54,7 @@ def make_transaction():
 def view_transaction():
     return render_template('./view_transactions.html')
 
-#TODO: ENCRYPT WALLET AND PRIVATE KEY BEFORE STORE IN saveKey
+#TODO: ENCRYPT WALLET AND PRIVATE KEY BEFORE STORE IN saveWallet
 @app.route('/wallet/new', methods=['GET'])
 def new_wallet():
     random_gen = Crypto.Random.new().read
