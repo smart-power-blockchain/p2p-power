@@ -123,8 +123,6 @@ class Blockchain:
         guess_hash = hashlib.sha256(guess).hexdigest()
         return guess_hash[:difficulty] == '0'*difficulty
 
-
-    #TODO: IMPLEMENT THE CHECKING OF INITIAL VALUE TO BEGIN WITH
     def valid_chain(self, chain):
         """
         check if a blockchain is valid
@@ -213,7 +211,7 @@ def new_transaction():
     # Check that the required fields are in the POST'ed data
     required = ['sender_address', 'recipient_address', 'amount', 'signature']
     if not all(k in values for k in required):
-        return 'Missing values', 400
+        return render_template('error')
     # Create a new Transaction
     transaction_result = blockchain.submit_transaction(
         values['sender_address'], values['recipient_address'], values['amount'], values['signature'])
