@@ -54,7 +54,11 @@ def make_transaction():
 def view_transaction():
     return render_template('./view_transactions.html')
 
-#TODO: ENCRYPT WALLET AND PRIVATE KEY BEFORE STORE IN saveWallet
+@app.route('/make/error')
+def make_error():
+    return render_template('./not_enough_coins.html')
+
+# TODO: ENCRYPT WALLET AND PRIVATE KEY BEFORE STORE IN saveWallet
 @app.route('/wallet/new', methods=['GET'])
 def new_wallet():
     random_gen = Crypto.Random.new().read
@@ -63,7 +67,7 @@ def new_wallet():
 
     with open('saveWallet.txt', 'w') as f:
         f.write("{},{},{}".format(binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
-        binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii'),DEFAULT_WALLET))
+                                  binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii'), DEFAULT_WALLET))
 
     response = {
         'private_key': binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
@@ -80,6 +84,9 @@ def generate_transaction():
     sender_private_key = request.form['sender_private_key']
     recipient_address = request.form['recipient_address']
     value = request.form['amount']
+
+    if int(value) > 50:
+        return 'error', 500
 
     transaction = Transaction(
         sender_address, sender_private_key, recipient_address, value)
