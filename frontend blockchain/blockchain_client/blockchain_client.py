@@ -9,7 +9,7 @@ import requests
 from flask import Flask, jsonify, request, render_template
 
 
-DEFAULT_WALLET = 50
+DEFAULT_WALLET_VALUE = 50
 
 
 class Transaction:
@@ -54,6 +54,7 @@ def make_transaction():
 def view_transaction():
     return render_template('./view_transactions.html')
 
+
 @app.route('/make/error')
 def make_error():
     return render_template('./not_enough_coins.html')
@@ -67,12 +68,13 @@ def new_wallet():
 
     with open('saveWallet.txt', 'w') as f:
         f.write("{},{},{}".format(binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
-                                  binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii'), DEFAULT_WALLET))
+                                  binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii'), DEFAULT_WALLET_VALUE))
 
     response = {
         'private_key': binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
-        'public_key': binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii')
-    }
+        'public_key': binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii'),
+        'wallet_value': 50
+        }
 
     return jsonify(response), 200
 
@@ -85,8 +87,12 @@ def generate_transaction():
     recipient_address = request.form['recipient_address']
     value = request.form['amount']
 
-    if int(value) > 50:
-        return 'error', 500
+    with open('saveWallet.txt','w') as f:
+        walletAmount = f.readline().split(',')[2]
+        if int(value) > int(walletAmount):
+            return 'error', 500
+        else:
+            f.readline().split(',')[2] -= value
 
     transaction = Transaction(
         sender_address, sender_private_key, recipient_address, value)
