@@ -84,6 +84,15 @@
 
     <br>
 
+    <div class="row">
+      <label class="col-sm-2">Wallet Initial balance</label>
+      <div class="col-sm-10">
+        <textarea id="wallet_value" rows="2" class="form-control" readonly></textarea>
+      </div>
+    </div>
+
+    <br>
+
     <div class="row" id="warning" style="display:none">
       <div class="col-sm-12">
         <div class="alert alert-danger" role="alert">
@@ -118,6 +127,7 @@
           success: function (response) {
             document.getElementById("private_key").innerHTML = response['private_key'];
             document.getElementById("public_key").innerHTML = response['public_key'];
+            document.getElementById("wallet_value").innerHTML = response['wallet_value'];
             document.getElementById("warning").style.display = "block";
           },
           error: function (error) {
