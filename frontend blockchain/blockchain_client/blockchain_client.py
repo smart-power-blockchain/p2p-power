@@ -59,22 +59,40 @@ def view_transaction():
 def make_error():
     return render_template('./not_enough_coins.html')
 
-# TODO: ENCRYPT WALLET AND PRIVATE KEY BEFORE STORE IN saveWallet
-@app.route('/wallet/new', methods=['GET'])
+
+@app.route('/wallet/new', methods=['POST'])
 def new_wallet():
     random_gen = Crypto.Random.new().read
     private_key = RSA.generate(1024, random_gen)
     public_key = private_key.publickey()
+    username = request.form['username']
+    surplus_energy = request.form['surplus_energy']
 
-    with open('saveWallet.txt', 'w') as f:
-        f.write("{},{},{}".format(binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
-                                  binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii'), DEFAULT_WALLET_VALUE))
+    user_exists = False
+
+    with open('saveWallet.txt', 'r+') as f:
+        for user in f.readlines():
+            if(user.split(',')[0] == username):
+                user_exists = True
+
+    with open('saveWallet.txt', 'a') as f:
+        if(user_exists != True):
+            f.write("{},{},{},{},{}\n".format(username,
+                                              binascii.hexlify(private_key.exportKey(
+                                                  format='DER')).decode('ascii'),
+                                              binascii.hexlify(public_key.exportKey(
+                                                  format='DER')).decode('ascii'),
+                                              DEFAULT_WALLET_VALUE, surplus_energy))
+        else:
+            return 'error', 500
 
     response = {
+        'username': username,
         'private_key': binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
         'public_key': binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii'),
-        'wallet_value': 50
-        }
+        'wallet_value': 50,
+        'surplus_energy': surplus_energy
+    }
 
     return jsonify(response), 200
 
@@ -87,12 +105,12 @@ def generate_transaction():
     recipient_address = request.form['recipient_address']
     value = request.form['amount']
 
-    with open('saveWallet.txt','w') as f:
-        walletAmount = f.readline().split(',')[2]
+    with open('saveWallet.txt', 'w') as f:
+        walletAmount = f.readline().split(',')[3]
         if int(value) > int(walletAmount):
             return 'error', 500
         else:
-            f.readline().split(',')[2] -= value
+            f.readline().split(',')[3] -= value
 
     transaction = Transaction(
         sender_address, sender_private_key, recipient_address, value)
