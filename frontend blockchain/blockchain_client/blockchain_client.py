@@ -6,7 +6,7 @@ from Crypto.Hash import SHA
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
 import requests
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, flash, redirect, session, url_for, logging
 
 
 DEFAULT_WALLET_VALUE = 50
@@ -41,8 +41,13 @@ app = Flask(__name__)
 
 
 @app.route('/')
+def login_page():
+    return render_template('./signup_login.html')
+
+
+@app.route('/generate/wallet')
 def index():
-    return render_template('./index.html')
+    return render_template('./generate_wallet.html')
 
 
 @app.route('/make/transaction')
