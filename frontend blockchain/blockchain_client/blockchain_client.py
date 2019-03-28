@@ -7,7 +7,8 @@ from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
 import requests
 from flask import Flask, jsonify, request, render_template, flash, redirect, session, url_for, logging
-
+from flask_mysqldb import MySQL
+from wtforms import Form, StringField, TextAreaField, PasswordField, IntegerField, validators
 
 DEFAULT_WALLET_VALUE = 50
 
@@ -37,12 +38,33 @@ class Transaction:
         return binascii.hexlify(signer.sign(h)).decode('ascii')
 
 
+class SignupForm(Form):
+    name = StringField('Name', [validators.Length(min=1, max=30)])
+    email = StringField('Email', [validators.Length(min=6, max=50)])
+    surplus_energy = IntegerField('Surplus Energy Units', [
+                                  validators.Length(min=1, max=30)
+                                  ])
+    password = PasswordField('Password', [
+        validators.DataRequired(),
+        validators.EqualTo('confirm', message="Passwords do not match")
+    ])
+    confirm = PasswordField('Confirm Password')
+
+
 app = Flask(__name__)
 
 
 @app.route('/')
 def login_page():
     return render_template('./signup_login.html')
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def register():
+    form = SignupForm(request.form)
+    if request.method == 'POST' and form.validate():
+        return render_template('signup.html')
+    return render_template('signup.html', form=form)
 
 
 @app.route('/generate/wallet')

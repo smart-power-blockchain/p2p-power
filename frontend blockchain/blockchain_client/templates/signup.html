@@ -8,7 +8,7 @@
 	<meta name="description" content="">
 	<meta name="author" content="">
 
-	<title>Trading Center</title>
+	<title>Sign Up</title>
 
 	<!-- Bootstrap core CSS -->
 	<link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -22,7 +22,7 @@
 	<!-- Navigation -->
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
 		<div class="container">
-			<a class="navbar-brand" href="#">Welcome To Energy Trading Center</a>
+			<a class="navbar-brand" href="#">Sign Up</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
 				aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
@@ -45,24 +45,35 @@
 		</div>
 	</nav>
 
-	<div>
-		<div class="col">
-			<div class="col-lg-12 text-center">
-				<div class="card-body">
-					<input type="button" id="sell_energy" class="btn btn-primary btn-lg" value="Sell Energy">
-				</div>
+	<div class="container">
+		{% from "_formhelpers.html" import render_field %}
+		<form method="POST" action="">
+			<div class="form-group">
+				{{render_field(form.name, class_="form-control")}}
 			</div>
-		</div>
-
-		<div class="col">
-			<div class="col-lg-12 text-center">
-				<div class="card-body">
-					<input type="button" id="buy_energy" class="btn btn-primary btn-lg" value="Buy Energy">
-				</div>
+			<div class="form-group">
+				{{render_field(form.email, class_="form-control")}}
+				<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone
+					else.</small>
 			</div>
-		</div>
+			<div class="form-group">
+				{{render_field(form.surplus_energy, class_="form-control")}}
+				<small id="energyHelp" class="form-text text-muted">Must be an Integer value for power Units.</small>
+			</div>
+			<div class="form-group">
+				{{render_field(form.password, class_="form-control")}}
+				<small id="passwordHelp" class="form-text text-muted">
+					Your password must be 8-20 characters long, contain letters and numbers, and must not contain
+					spaces,
+					special characters, or emoji.
+				</small>
+			</div>
+			<div class="form-group">
+				{{render_field(form.confirm, class_="form-control")}}
+			</div>
+			<p><input type="submit" class="btn btn-primary" value="Submit"></p>
+		</form>
 	</div>
-
 
 </body>
 
