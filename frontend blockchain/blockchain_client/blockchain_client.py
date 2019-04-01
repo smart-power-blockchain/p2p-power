@@ -9,6 +9,7 @@ import requests
 from flask import Flask, jsonify, request, render_template, flash, redirect, session, url_for, logging
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, IntegerField, validators
+from passlib.hash import sha256_crypt
 
 DEFAULT_WALLET_VALUE = 50
 
@@ -41,9 +42,7 @@ class Transaction:
 class SignupForm(Form):
     name = StringField('Name', [validators.Length(min=1, max=30)])
     email = StringField('Email', [validators.Length(min=6, max=50)])
-    surplus_energy = IntegerField('Surplus Energy Units', [
-                                  validators.Length(min=1, max=30)
-                                  ])
+    surplus_energy = IntegerField('Surplus Energy Units')
     password = PasswordField('Password', [
         validators.DataRequired(),
         validators.EqualTo('confirm', message="Passwords do not match")
@@ -54,17 +53,58 @@ class SignupForm(Form):
 app = Flask(__name__)
 
 
+## CONFIGURATION FOR MYSQL DATABASE ##
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'akhil'
+app.config['MYSQL_DB'] = 'jhoncoin'
+app.config['MYSQL_PASSWORD'] = 'akhil@user'
+app.config['MYSQL_CURSOR'] = 'DictCursor'
+
+app.secret_key = "super secret key"
+
+# initialize mysql
+mysql = MySQL(app)
+
+
 @app.route('/')
-def login_page():
+def start_page():
     return render_template('./signup_login.html')
 
 
+# TODO: MAKE LOGIN PAGE
+# TODO: REDIRECT TO GENERATE WALLET PAGE FROM LOGIN PAGE WHEN LOGGED IN
 @app.route('/signup', methods=['GET', 'POST'])
 def register():
     form = SignupForm(request.form)
     if request.method == 'POST' and form.validate():
-        return render_template('signup.html')
+        name = form.name.data
+        email = form.email.data
+        surplus_energy = int(form.surplus_energy.data)
+        password = sha256_crypt.encrypt(str(form.password.data))
+
+        # Create cursor
+        cur = mysql.connection.cursor()
+
+        # Execute query
+        cur.execute("INSERT INTO users(name, email, surplus_energy, password) VALUES(%s, %s, %s, %s)",
+                    (name, email, surplus_energy, password))
+
+        # Commit to DB
+        mysql.connection.commit()
+
+        # Close connection
+        cur.close()
+        flash('You are now registered and can log in', 'success')
+
+        # redirect to login page
+        return redirect(url_for('login'))
+
     return render_template('signup.html', form=form)
+
+
+@app.route('/login')
+def login():
+    return render_template('./login.html')
 
 
 @app.route('/generate/wallet')
@@ -132,12 +172,12 @@ def generate_transaction():
     recipient_address = request.form['recipient_address']
     value = request.form['amount']
 
-    with open('saveWallet.txt', 'w') as f:
+    with open('saveWallet.txt', 'r+') as f:
         walletAmount = f.readline().split(',')[3]
         if int(value) > int(walletAmount):
             return 'error', 500
-        else:
-            f.readline().split(',')[3] -= value
+        # else:
+        #     f.readline().split(',')[3] -= value
 
     transaction = Transaction(
         sender_address, sender_private_key, recipient_address, value)
