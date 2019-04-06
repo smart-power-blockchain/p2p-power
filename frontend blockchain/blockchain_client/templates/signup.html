@@ -17,10 +17,10 @@
 
 </head>
 
-<body>
+<body style="background-image: url('../static/img/jhoncoin.jpg') ; background-size: cover;">
 
 	<!-- Navigation -->
-	<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
 		<div class="container">
 			<a class="navbar-brand" href="#">Sign Up</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
@@ -51,6 +51,7 @@
 		<form method="POST" action="">
 			<div class="form-group">
 				{{render_field(form.name, class_="form-control")}}
+				<small id="userHelp" class="form-text text-muted">This Name is Username and must be unique</small>
 			</div>
 			<div class="form-group">
 				{{render_field(form.email, class_="form-control")}}
@@ -86,11 +87,8 @@
 		</form>
 	</div>
 
-	<!-- TODO: ADD SHOW GENERATE WALLET BUTTON ON GETTING POSITIVE RESPONSE -->
 	<script>
-		document.getElementById("generate_wallet").onclick = function () {
-			window.location.href('./generate_wallet.html');
-		};
+	
 	</script>
 
 </body>

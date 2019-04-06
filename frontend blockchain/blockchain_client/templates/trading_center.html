@@ -17,12 +17,12 @@
 
 </head>
 
-<body>
+<body style="background-image: url('../static/img/jhoncoin.jpg') ; background-size: cover;">
 
 	<!-- Navigation -->
-	<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
 		<div class="container">
-			<a class="navbar-brand" href="#">Welcome To Energy Trading Center</a>
+			<a class="navbar-brand" href="#">Energy Trading Center</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
 				aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="navbar-toggler-icon"></span>
@@ -34,30 +34,52 @@
 							<span class="sr-only">(current)</span>
 						</a>
 					</li>
+					{% if session.logged_in %}
 					<li class="nav-item">
-						<a class="nav-link" href="/login">log In</a>
+						<a class="nav-link" href="/logout">logout</a>
+					</li>
+					{% else %}
+					<li class="nav-item">
+						<a class="nav-link" href="/login">login</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="/signup">Sign Up</a>
 					</li>
+					{% endif %}
 				</ul>
 			</div>
 		</div>
 	</nav>
 
-	<div>
-		<div class="col">
+	<div class="container">
+
+
+		{% block body %}
+		<h1 class="font-italic text-warning">Welcome <small class="font-weight-bold text-success">{{session.username}}</small></h1>
+		{% endblock %}
+
+
+		<div class="row">
 			<div class="col-lg-12 text-center">
 				<div class="card-body">
-					<input type="button" id="sell_energy" class="btn btn-primary btn-lg" value="Sell Energy">
+					<a href="/generate/wallet"><input type="button" id="generate_wallet" class="btn btn-primary btn-lg"
+							value="Generate Wallet"></a>
 				</div>
 			</div>
 		</div>
-
-		<div class="col">
+		<div class="row">
 			<div class="col-lg-12 text-center">
 				<div class="card-body">
+					<input type="button" id="sell_energy" class="btn btn-primary btn-lg" value="Sell Energy">
 					<input type="button" id="buy_energy" class="btn btn-primary btn-lg" value="Buy Energy">
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12 text-center">
+				<div class="card-body">
+					<input type="button" id="update_energy" class="btn btn-primary btn-lg"
+						value="Update Surplus Energy">
 				</div>
 			</div>
 		</div>

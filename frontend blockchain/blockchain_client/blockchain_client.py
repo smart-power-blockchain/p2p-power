@@ -10,6 +10,7 @@ from flask import Flask, jsonify, request, render_template, flash, redirect, ses
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, IntegerField, validators
 from passlib.hash import sha256_crypt
+from functools import wraps
 
 DEFAULT_WALLET_VALUE = 50
 
@@ -58,7 +59,7 @@ app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'akhil'
 app.config['MYSQL_DB'] = 'jhoncoin'
 app.config['MYSQL_PASSWORD'] = 'akhil@user'
-app.config['MYSQL_CURSOR'] = 'DictCursor'
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 app.secret_key = "super secret key"
 
@@ -68,9 +69,30 @@ mysql = MySQL(app)
 
 @app.route('/')
 def start_page():
-    return render_template('./signup_login.html')
+    return render_template('./index.html')
 
 
+@app.route('/generate/wallet')
+def generate_wallet():
+    return render_template('./generate_wallet.html')
+
+
+@app.route('/make/transaction')
+def make_transaction():
+    return render_template('./make_transaction.html')
+
+
+@app.route('/view/transactions')
+def view_transaction():
+    return render_template('./view_transactions.html')
+
+
+@app.route('/make/error')
+def make_error():
+    return render_template('./not_enough_coins.html')
+
+
+# TODO: CHECCK USERNAME IN REPOSITORY
 # TODO: MAKE LOGIN PAGE
 # TODO: REDIRECT TO GENERATE WALLET PAGE FROM LOGIN PAGE WHEN LOGGED IN
 @app.route('/signup', methods=['GET', 'POST'])
@@ -94,37 +116,73 @@ def register():
 
         # Close connection
         cur.close()
-        flash('You are now registered and can log in', 'success')
 
-        # redirect to login page
-        return redirect(url_for('login'))
+        # redirect to login page with success
+        return render_template('/login.html', msg='Signup Successful You May Login Now')
 
     return render_template('signup.html', form=form)
 
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('./login.html')
+    if request.method == 'POST':
+        username = request.form['username']
+        password_candidate = request.form['password']
+
+        # Create cursor
+        cur = mysql.connection.cursor()
+
+        # Execute query
+        result = cur.execute(
+            "SELECT * FROM users WHERE name = %s", [username])
+
+        if result > 0:
+            data = cur.fetchone()
+            password = data['password']
+
+            if sha256_crypt.verify(password_candidate, password):
+                session['logged_in'] = True
+                session['username'] = username
+
+                flash('You are now logged in', 'success')
+                return redirect(url_for('dashboard'))
+            else:
+                return render_template('/login.html', error='Password Does Not Match')
+
+            # Close connection
+            cur.close()
+        else:
+            return render_template('/login.html', error='Username Not Found')
+
+    return render_template('/login.html')
+
+# Check if user logged in
 
 
-@app.route('/generate/wallet')
-def index():
-    return render_template('./generate_wallet.html')
+def is_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Unauthorized, Please login', 'danger')
+            return redirect(url_for('login'))
+
+    return wrap
 
 
-@app.route('/make/transaction')
-def make_transaction():
-    return render_template('./make_transaction.html')
+@app.route('/logout')
+@is_logged_in
+def logout():
+    session.clear()
+    flash('You are now logged out', 'success')
+    return redirect(url_for('login'))
 
 
-@app.route('/view/transactions')
-def view_transaction():
-    return render_template('./view_transactions.html')
-
-
-@app.route('/make/error')
-def make_error():
-    return render_template('./not_enough_coins.html')
+@app.route('/dashboard')
+@is_logged_in
+def dashboard():
+    return render_template('./trading_center.html')
 
 
 @app.route('/wallet/new', methods=['POST'])
