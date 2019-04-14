@@ -72,26 +72,6 @@ def start_page():
     return render_template('./index.html')
 
 
-@app.route('/generate/wallet')
-def generate_wallet():
-    return render_template('./generate_wallet.html')
-
-
-@app.route('/make/transaction')
-def make_transaction():
-    return render_template('./make_transaction.html')
-
-
-@app.route('/view/transactions')
-def view_transaction():
-    return render_template('./view_transactions.html')
-
-
-@app.route('/make/error')
-def make_error():
-    return render_template('./not_enough_coins.html')
-
-
 # TODO: CHECCK USERNAME IN REPOSITORY
 # TODO: MAKE LOGIN PAGE
 # TODO: REDIRECT TO GENERATE WALLET PAGE FROM LOGIN PAGE WHEN LOGGED IN
@@ -145,7 +125,7 @@ def login():
                 session['username'] = username
 
                 flash('You are now logged in', 'success')
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('trading_center'))
             else:
                 return render_template('/login.html', error='Password Does Not Match')
 
@@ -179,10 +159,54 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/dashboard')
+@app.route('/trading_center')
 @is_logged_in
-def dashboard():
+def trading_center():
     return render_template('./trading_center.html')
+
+
+@app.route('/generate/wallet')
+@is_logged_in
+def generate_wallet():
+    return render_template('./generate_wallet.html')
+
+
+@app.route('/make/transaction')
+@is_logged_in
+def make_transaction():
+    return render_template('./make_transaction.html')
+
+
+@app.route('/view/transactions')
+@is_logged_in
+def view_transaction():
+    return render_template('./view_transactions.html')
+
+
+@app.route('/make/error')
+@is_logged_in
+def make_error():
+    return render_template('./not_enough_coins.html')
+
+
+@app.route('/buy_energy', methods=['GET', 'POST'])
+@is_logged_in
+def buy_energy():
+    cur = mysql.connection.cursor()
+    result = cur.execute(
+        "SELECT name, surplus_energy FROM users WHERE surplus_energy > 0")
+    sellers = cur.fetchall()
+
+    if result > 0:
+        return render_template('./buy_energy.html', sellers=sellers)
+    else:
+        return render_template('./buy_energy.html', error="No sellers available")
+
+
+@app.route('/sell_energy')
+@is_logged_in
+def sell_energy():
+    return render_template('./sell_energy.html')
 
 
 @app.route('/wallet/new', methods=['POST'])

@@ -52,37 +52,33 @@
 	</nav>
 
 	<div class="container">
-		{% include "./includes/_messages.html" %}
 
 		{% block body %}
-		<h1 class="font-italic text-warning">Welcome <small class="font-weight-bold text-success">{{session.username}}</small></h1>
+		<h1 class="font-italic text-warning">Welcome <small
+				class="font-weight-bold text-success">{{session.username}}</small></h1>
 		{% endblock %}
 
+		<div class="card-text text-info">
+			Select user to buy Energy from
+		</div>
 
-		<div class="row">
-			<div class="col-lg-12 text-center">
-				<div class="card-body">
-					<a href="/generate/wallet"><input type="button" id="generate_wallet" class="btn btn-primary btn-lg"
-							value="Generate Wallet"></a>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-lg-12 text-center">
-				<div class="card-body">
-					<a href="/sell_energy"><input type="button" id="sell_energy" class="btn btn-primary btn-lg" value="Sell Energy"></a>
-					<a href="/buy_energy"><input type="button" id="buy_energy" class="btn btn-primary btn-lg" value="Buy Energy"></a>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-lg-12 text-center">
-				<div class="card-body">
-					<input type="button" id="update_energy" class="btn btn-primary btn-lg"
-						value="Update Surplus Energy">
-				</div>
-			</div>
-		</div>
+		<br>
+
+<!-- TODO: ADD LINKS TO BUY DIRECTLY FROM USERS -->
+		<table class="table table-bordered table-striped text-light">
+			<tr>
+				<th>Username</th>
+				<th>Surplus Energy</th>
+			</tr>
+			{% for user in sellers %}
+			<tr>
+				<td>{{user.name}}</td>
+				<td>{{user.surplus_energy}}</td>
+			</tr>
+			{% endfor %}
+		</table>
+		{% include "./includes/_messages.html" %}
+
 	</div>
 
 
