@@ -72,9 +72,7 @@ def start_page():
     return render_template('./index.html')
 
 
-# TODO: CHECCK USERNAME IN REPOSITORY
-# TODO: MAKE LOGIN PAGE
-# TODO: REDIRECT TO GENERATE WALLET PAGE FROM LOGIN PAGE WHEN LOGGED IN
+# TODO: CHECK USERNAME IN REPOSITORY
 @app.route('/signup', methods=['GET', 'POST'])
 def register():
     form = SignupForm(request.form)
@@ -82,7 +80,7 @@ def register():
         name = form.name.data
         email = form.email.data
         surplus_energy = int(form.surplus_energy.data)
-        password = sha256_crypt.encrypt(str(form.password.data))
+        password = sha256_crypt.hash(str(form.password.data))
 
         # Create cursor
         cur = mysql.connection.cursor()

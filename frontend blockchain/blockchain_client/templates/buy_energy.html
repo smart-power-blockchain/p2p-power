@@ -64,17 +64,19 @@
 
 		<br>
 
-<!-- TODO: ADD LINKS TO BUY DIRECTLY FROM USERS -->
+		<!-- TODO: ADD LINKS TO BUY DIRECTLY FROM USERS -->
 		<table class="table table-bordered table-striped text-light">
 			<tr>
 				<th>Username</th>
 				<th>Surplus Energy</th>
 			</tr>
 			{% for user in sellers %}
-			<tr>
-				<td>{{user.name}}</td>
-				<td>{{user.surplus_energy}}</td>
-			</tr>
+			<a>
+				<tr>
+					<td>{{user.name}}</td>
+					<td>{{user.surplus_energy}}</td>
+				</tr>
+			</a>
 			{% endfor %}
 		</table>
 		{% include "./includes/_messages.html" %}
