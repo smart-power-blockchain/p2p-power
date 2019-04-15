@@ -72,7 +72,6 @@ def start_page():
     return render_template('./index.html')
 
 
-# TODO: CHECK USERNAME IN REPOSITORY
 @app.route('/signup', methods=['GET', 'POST'])
 def register():
     form = SignupForm(request.form)
@@ -83,17 +82,24 @@ def register():
         password = sha256_crypt.hash(str(form.password.data))
 
         # Create cursor
-        cur = mysql.connection.cursor()
+        cur1 = mysql.connection.cursor()
+        cur2 = mysql.connection.cursor()
 
         # Execute query
-        cur.execute("INSERT INTO users(name, email, surplus_energy, password) VALUES(%s, %s, %s, %s)",
-                    (name, email, surplus_energy, password))
+        result = cur2.execute("SELECT  * from users where name = %s", [name])
+        print("sfbhsdfbshdbfsdh\n\n\n"+str(result)+"\n\n\nsbeve")
+        if result > 0:
+            return render_template('signup.html', form=form, error='Username Already Exists Try A Diffrent Username')
+        else:
+            cur1.execute("INSERT INTO users(name, email, surplus_energy, password) VALUES(%s, %s, %s, %s)",
+                         (name, email, surplus_energy, password))
 
         # Commit to DB
         mysql.connection.commit()
 
         # Close connection
-        cur.close()
+        cur1.close()
+        cur2.close()
 
         # redirect to login page with success
         return render_template('/login.html', msg='Signup Successful You May Login Now')
