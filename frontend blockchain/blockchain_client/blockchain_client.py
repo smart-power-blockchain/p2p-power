@@ -276,13 +276,13 @@ def generate_transaction():
 
     cur1 = mysql.connection.cursor()
     result = cur1.execute(
-        "UPDATE users set wallet_value = wallet_value - %s and surplus_energy = surplus_energy + %s where public_key = %s", [value, value, sender_address])
+        "UPDATE users set wallet_value = wallet_value - %s, surplus_energy = surplus_energy + %s where public_key = %s", [value, value, sender_address])
     mysql.connection.commit()
     cur1.close()
 
     cur2 = mysql.connection.cursor()
     result = cur2.execute(
-        "UPDATE users set wallet_value = wallet_value + %s and surplus_energy = surplus_energy - %s where public_key = %s", [value, value, recipient_address])
+        "UPDATE users set wallet_value = wallet_value + %s, surplus_energy = surplus_energy - %s where public_key = %s", [value, value, recipient_address])
     mysql.connection.commit()
     cur2.close()
 
