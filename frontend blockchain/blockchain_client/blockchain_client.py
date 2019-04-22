@@ -11,6 +11,9 @@ from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, IntegerField, validators
 from passlib.hash import sha256_crypt
 from functools import wraps
+from tempfile import mkstemp
+from shutil import move
+from os import fdopen, remove
 
 DEFAULT_WALLET_VALUE = 50
 
@@ -78,7 +81,6 @@ def register():
     if request.method == 'POST' and form.validate():
         name = form.name.data
         email = form.email.data
-        surplus_energy = int(form.surplus_energy.data)
         password = sha256_crypt.hash(str(form.password.data))
 
         # Create cursor
@@ -87,12 +89,12 @@ def register():
 
         # Execute query
         result = cur2.execute("SELECT  * from users where name = %s", [name])
-        print("sfbhsdfbshdbfsdh\n\n\n"+str(result)+"\n\n\nsbeve")
+
         if result > 0:
             return render_template('signup.html', form=form, error='Username Already Exists Try A Diffrent Username')
         else:
-            cur1.execute("INSERT INTO users(name, email, surplus_energy, password) VALUES(%s, %s, %s, %s)",
-                         (name, email, surplus_energy, password))
+            cur1.execute("INSERT INTO users(name, email, password) VALUES(%s, %s, %s)",
+                         (name, email, password))
 
         # Commit to DB
         mysql.connection.commit()
@@ -193,12 +195,29 @@ def make_error():
     return render_template('./not_enough_coins.html')
 
 
+@app.route('/update_energy', methods=['GET', 'POST'])
+@is_logged_in
+def update_energy():
+    if request.method == 'POST':
+        cur = mysql.connection.cursor()
+        result = cur.execute("UPDATE users SET surplus_energy = surplus_energy + %s where name = %s", [
+                             request.form['updated_energy'], request.form['username']])
+        mysql.connection.commit()
+        cur.close()
+        if result > 0:
+            return render_template('./update_energy.html', msg="Updated value has been successfully added")
+        else:
+            return render_template('./update_energy.html', error="ERROR ! Try Again")
+
+    return render_template('./update_energy.html')
+
+
 @app.route('/buy_energy', methods=['GET', 'POST'])
 @is_logged_in
 def buy_energy():
     cur = mysql.connection.cursor()
     result = cur.execute(
-        "SELECT name, surplus_energy FROM users WHERE surplus_energy > 0")
+        "SELECT name, surplus_energy, public_key FROM users WHERE surplus_energy > 0")
     sellers = cur.fetchall()
 
     if result > 0:
@@ -206,14 +225,12 @@ def buy_energy():
     else:
         return render_template('./buy_energy.html', error="No sellers available")
 
-
-@app.route('/sell_energy')
-@is_logged_in
-def sell_energy():
-    return render_template('./sell_energy.html')
+    if request.method == 'POST':
+        print(request.form)
 
 
 @app.route('/wallet/new', methods=['POST'])
+@is_logged_in
 def new_wallet():
     random_gen = Crypto.Random.new().read
     private_key = RSA.generate(1024, random_gen)
@@ -221,23 +238,21 @@ def new_wallet():
     username = request.form['username']
     surplus_energy = request.form['surplus_energy']
 
-    user_exists = False
+    curWalletExist = mysql.connection.cursor()
+    resultWalletExist = curWalletExist.execute(
+        "SELECT * FROM users where name = %s and wallet_exist = %s", [username, 1])
 
-    with open('saveWallet.txt', 'r+') as f:
-        for user in f.readlines():
-            if(user.split(',')[0] == username):
-                user_exists = True
+    if(resultWalletExist == 0):
+        cur = mysql.connection.cursor()
+        result = cur.execute(
+            "UPDATE users SET public_key = %s, private_key = %s, surplus_energy = %s, wallet_value = %s, wallet_exist = %s WHERE name = %s", [binascii.hexlify(public_key.exportKey(
+                format='DER')).decode('ascii'), binascii.hexlify(private_key.exportKey(
+                    format='DER')).decode('ascii'), surplus_energy, DEFAULT_WALLET_VALUE, 1, username])
 
-    with open('saveWallet.txt', 'a') as f:
-        if(user_exists != True):
-            f.write("{},{},{},{},{}\n".format(username,
-                                              binascii.hexlify(private_key.exportKey(
-                                                  format='DER')).decode('ascii'),
-                                              binascii.hexlify(public_key.exportKey(
-                                                  format='DER')).decode('ascii'),
-                                              DEFAULT_WALLET_VALUE, surplus_energy))
-        else:
-            return 'error', 500
+        mysql.connection.commit()
+        cur.close()
+    else:
+        return 'error', 500
 
     response = {
         'username': username,
@@ -251,6 +266,7 @@ def new_wallet():
 
 
 @app.route('/generate/transaction', methods=['POST'])
+@is_logged_in
 def generate_transaction():
 
     sender_address = request.form['sender_address']
@@ -258,12 +274,17 @@ def generate_transaction():
     recipient_address = request.form['recipient_address']
     value = request.form['amount']
 
-    with open('saveWallet.txt', 'r+') as f:
-        walletAmount = f.readline().split(',')[3]
-        if int(value) > int(walletAmount):
-            return 'error', 500
-        # else:
-        #     f.readline().split(',')[3] -= value
+    cur1 = mysql.connection.cursor()
+    result = cur1.execute(
+        "UPDATE users set wallet_value = wallet_value - %s and surplus_energy = surplus_energy + %s where public_key = %s", [value, value, sender_address])
+    mysql.connection.commit()
+    cur1.close()
+
+    cur2 = mysql.connection.cursor()
+    result = cur2.execute(
+        "UPDATE users set wallet_value = wallet_value + %s and surplus_energy = surplus_energy - %s where public_key = %s", [value, value, recipient_address])
+    mysql.connection.commit()
+    cur2.close()
 
     transaction = Transaction(
         sender_address, sender_private_key, recipient_address, value)

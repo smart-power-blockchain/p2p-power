@@ -60,45 +60,31 @@
 		{% endblock %}
 
 
-		<div class="row">
-			<div class="col-lg-12 text-center">
-				<div class="card-body">
-					<a href="/generate/wallet">
-						<input type="button" id="generate_wallet" class="btn btn-primary btn-lg"
-							value="Generate Wallet">
-					</a>
+		<br><br>
+		<form class="container" method="POST">
+			<div class="row">
+				<label class="col-sm-2 text-light">Username:</label>
+				<div class="col-sm-10">
+					<input type="text" id="username" name="username" rows="2" class="form-control" readonly
+						value="{{session.username}}">
 				</div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-lg-12 text-center">
-				<div class="card-body">
-					<a href="/make/transaction">
-						<input type="button" id="make_transaction" class="btn btn-primary btn-lg"
-							value="Make Transaction">
-					</a>
+
+			<br>
+			
+			<div class="row">
+				<label class="col-sm-2 text-light">Enter The Updated Surplus Energy Amount:</label>
+				<div class="col-sm-10">
+					<input rows="2" id="updated_energy" name="updated_energy" rows="2" class="form-control" required>
+					<small class="form-text text-muted">Enter the energy you want to add to your existing energy
+						value</small>
 				</div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-lg-12 text-center">
-				<div class="card-body">
-					<a href="/buy_energy">
-						<input type="button" id="buy_energy" class="btn btn-primary btn-lg" value="Buy Energy">
-					</a>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-lg-12 text-center">
-				<div class="card-body">
-					<a href="/update_energy">
-						<input type="button" id="update_energy" class="btn btn-primary btn-lg"
-							value="Update Surplus Energy">
-					</a>
-				</div>
-			</div>
-		</div>
+			<br>
+
+			<input type="submit" class="btn btn-primary" value="Submit">
+
+		</form>
 	</div>
 
 

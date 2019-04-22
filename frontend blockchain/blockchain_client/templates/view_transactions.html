@@ -42,6 +42,11 @@
               <span class="sr-only">(current)</span>
             </a>
           </li>
+          {% if session.logged_in %}
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">logout</a>
+          </li>
+          {% endif %}
         </ul>
       </div>
     </div>
@@ -50,12 +55,17 @@
 
   <!-- Blockchain Node URL Selector -->
   <div class="container">
+    {% block body %}
+    <h1 class="font-italic text-warning">Welcome <small
+        class="font-weight-bold text-success">{{session.username}}</small></h1>
+    {% endblock %}
     <div class="row">
       <div class="col-lg-12">
 
         <div class="card-body">
           <h4 class="card-title text-light">View Transactions</h4>
-          <p class="card-text text-muted">Enter a blockchain node URL and click on "View Transactions" button to check all
+          <p class="card-text text-muted">Enter a blockchain node URL and click on "View Transactions" button to check
+            all
             transactions</p>
         </div>
 
@@ -85,7 +95,7 @@
   <br>
   <!-- Blockchain Transactions Table -->
   <div class="container">
-    <table id="transactions_table" class="table table-striped table-bordered" cellspacing="0" width="100%">
+    <table id="transactions_table" class="table table-striped table-bordered text-muted" cellspacing="0" width="100%">
     </table>
   </div>
 
