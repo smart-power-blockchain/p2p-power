@@ -150,8 +150,6 @@
         type: 'GET',
         success: function (response) {
 
-          //console.log(response);
-          //Generate Transactions Table
           var transactions = [];
           count = 1;
 
@@ -200,22 +198,17 @@
           url: "/mine",
           type: "GET",
           success: function (response) {
-
             window.location.reload();
-
           },
           error: function (error) {
             console.log(error);
           }
         });
-
       });
 
 
       $("#refresh_transactions").click(function () {
-
         window.location.reload();
-
       });
 
 
@@ -236,13 +229,7 @@
 
       });
 
-
-
-
     })
-
-
-
 
 
   </script>

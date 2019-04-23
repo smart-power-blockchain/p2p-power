@@ -238,6 +238,11 @@ def new_wallet():
     username = request.form['username']
     surplus_energy = request.form['surplus_energy']
 
+    pub_key = binascii.hexlify(
+        public_key.exportKey(format='DER')).decode('ascii')
+    pri_key = binascii.hexlify(
+        private_key.exportKey(format='DER')).decode('ascii')
+
     curWalletExist = mysql.connection.cursor()
     resultWalletExist = curWalletExist.execute(
         "SELECT * FROM users where name = %s and wallet_exist = %s", [username, 1])
@@ -245,9 +250,7 @@ def new_wallet():
     if(resultWalletExist == 0):
         cur = mysql.connection.cursor()
         result = cur.execute(
-            "UPDATE users SET public_key = %s, private_key = %s, surplus_energy = %s, wallet_value = %s, wallet_exist = %s WHERE name = %s", [binascii.hexlify(public_key.exportKey(
-                format='DER')).decode('ascii'), binascii.hexlify(private_key.exportKey(
-                    format='DER')).decode('ascii'), surplus_energy, DEFAULT_WALLET_VALUE, 1, username])
+            "UPDATE users SET public_key = %s, private_key = %s, surplus_energy = %s, wallet_value = %s, wallet_exist = %s WHERE name = %s", [pub_key, pri_key, surplus_energy, DEFAULT_WALLET_VALUE, 1, username])
 
         mysql.connection.commit()
         cur.close()
@@ -256,8 +259,8 @@ def new_wallet():
 
     response = {
         'username': username,
-        'private_key': binascii.hexlify(private_key.exportKey(format='DER')).decode('ascii'),
-        'public_key': binascii.hexlify(public_key.exportKey(format='DER')).decode('ascii'),
+        'private_key': pri_key,
+        'public_key': pub_key,
         'wallet_value': 50,
         'surplus_energy': surplus_energy
     }

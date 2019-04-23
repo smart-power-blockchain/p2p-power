@@ -81,7 +81,7 @@ class Blockchain:
         """
         Add a block of transactions to the blockchain
         """
-        block = {'block_number': len(self.chain) + 1,
+        block = {'block_number': len(self.chain),
                  'timestamp': time(),
                  'transactions': self.transactions,
                  'nonce': nonce,
