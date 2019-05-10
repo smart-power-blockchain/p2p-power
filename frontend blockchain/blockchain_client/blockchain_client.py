@@ -165,7 +165,7 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/trading_center')
+@app.route('/trading_center') 
 @is_logged_in
 def trading_center():
     return render_template('./trading_center.html')

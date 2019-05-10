@@ -108,7 +108,6 @@
     $(function () {
 
       $("#add_node_button").click(function () {
-        //console.log($('#confirmation_transaction_form').serialize());
 
         $.ajax({
           url: "/nodes/register",
@@ -139,7 +138,6 @@
           var node = "";
 
           for (i = 0; i < response['nodes'].length; i++) {
-            //node = "<li>" + response['nodes'][i] + "</li>";
             node = "<li> <a href=http://" + response['nodes'][i] + ">" + response['nodes'][i] + "</a></li>";
             document.getElementById("list_nodes").innerHTML += node;
 

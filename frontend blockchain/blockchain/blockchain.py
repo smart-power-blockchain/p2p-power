@@ -264,6 +264,10 @@ def mine():
         'nonce': block['nonce'],
         'previous_hash': block['previous_hash'],
     }
+
+    app_url = "http://192.168.43.250:5000"
+
+    requests.request('GET', app_url+"/transfer?energy="+str(5))
     return jsonify(response), 200
 
 
